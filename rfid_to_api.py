@@ -5,6 +5,8 @@ import RPi.GPIO as GPIO
 import MFRC522
 import signal
 
+continue_reading = True
+
 
 def end_read(signal, frame):
     global continue_reading
