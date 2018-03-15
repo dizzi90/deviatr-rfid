@@ -46,7 +46,7 @@ while continue_reading:
     if status == MIFAREReader.MI_OK:
 
         # print( UID)
-		API_Success = SendToAPI(uid)
+        API_Success = SendToAPI(uid)
         print("Card read UID: "+str(uid[0])+"," +
               str(uid[1])+","+str(uid[2])+","+str(uid[3]))
 
