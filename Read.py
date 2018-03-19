@@ -25,16 +25,16 @@ def Celebrate():
     Say('Iotkonge')
     Say('Marius')
     GPIO.setmode(GPIO.BOARD)
-    GPIO.setup(03, GPIO.OUT)
-    pwm = GPIO.PWM(03, 50)
+    GPIO.setup(3, GPIO.OUT)
+    pwm = GPIO.PWM(3, 50)
     pwm.start(0)
 
     def SetAngle(angle):
         duty = angle / 18 + 2
-        GPIO.output(03, True)
+        GPIO.output(3, True)
         pwm.ChangeDutyCycle(duty)
         time.sleep(1)
-        GPIO.output(03, False)
+        GPIO.output(3, False)
         pwm.ChangeDutyCycle(0)
     SetAngle(40)
     pwm.stop()
@@ -66,7 +66,7 @@ def PositiveFeedback(event, identity=False):
             name_sounds = ['Jonny', 'Magnus']
             id_resp = json.loads(identity.text)
             first_name = str(id_resp['Name']).split()[0]
-            print('firstname is '+first_name)
+
             if first_name in name_sounds:
                 Say(first_name)
             else:
@@ -75,9 +75,8 @@ def PositiveFeedback(event, identity=False):
                 else:
                     Say('Dollarfornavn')
 
-        print('good photography. you are an artist, Doser.')
         return True
-    print('good doser')
+
     return True
 
 
@@ -96,9 +95,17 @@ def NegativeFeedback():
     print('Bad doser.\n')
 
 
+def ValidateSscc(sscc):
+    if sscc.startswith('0037') and len(sscc) == 20:
+        return True
+    else:
+        return False
+
+
 def ScanSSCC():
-    SSCC = str(raw_input('scan\n'))
-    if SSCC.startswith('0037') and len(SSCC) == 20:
+    """Scan pallet barcode."""
+    SSCC = str(input('scan\n'))
+    if ValidateSscc(SSCC):
         return SSCC
     NegativeFeedback()
 
@@ -153,6 +160,7 @@ def Submit(deviation, filename):
 
 
 def ConcatenateEmployeeId(list):
+    ''' Returns single string '''
     return str(list[0]) + str(list[1]) + str(list[2]) + str(list[3])
 
 
@@ -162,7 +170,7 @@ def GetUid():
 
 
 def mainLoop(uid):
-    '''main'''
+    '''main loop.'''
     signal.signal(signal.SIGINT, end_read)
     MIFAREReader = MFRC522.MFRC522()
     (status, TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
@@ -186,12 +194,10 @@ def mainLoop(uid):
                             deviation = {'sscc': sscc,
                                          'employee': employee,
                                          'uid': uid,
-                                         #'base64': pic,
                                          'eventid': event}
                             submission = Submit(deviation, 'foo.jpg')
                             if submission:
                                 PositiveFeedback('GOOD_SUBMISSION', identity)
-                                print('submitted. looping')
                                 return None
 
 
